@@ -2,7 +2,7 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use std::hint::black_box;
 use rand;
 use ndarray::{Array, Array2};
-use rublas::naive_matmul; 
+use rublas::{naive_matmul, blocked_matmul}; 
 
 fn bench_naive_matmul(c: &mut Criterion) {
     // Define matrix dimensions
@@ -15,7 +15,7 @@ fn bench_naive_matmul(c: &mut Criterion) {
     let b = Array::from_shape_fn((k, n), |_| rand::random());
     let result = Array2::<f32>::zeros((m, n));
 
-    // The benchmark
+    // NAIVE 
     c.bench_function("naive_matmul_256", |bencher| {
         // Create the result matrix inside the bencher to reset it for each run
         let mut result = Array2::<f32>::zeros((m, n));
@@ -24,6 +24,14 @@ fn bench_naive_matmul(c: &mut Criterion) {
             // Pass the inputs and the mutable result directly
             // black_box the output to ensure the work isn't optimized away
             naive_matmul(&a.view(), &b.view(), &mut result);
+            black_box(&result);
+        })
+    });
+    // BLOCK 
+    c.bench_function("blocked_matmul_256", | bencher| {
+        let mut result = Array2::<f32>::zeros((m, n));
+        bencher.iter(||{
+            blocked_matmul(&a.view(), &b.view(), &mut result);
             black_box(&result);
         })
     });

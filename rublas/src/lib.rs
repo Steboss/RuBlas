@@ -23,7 +23,7 @@ pub fn naive_matmul(a: &ArrayView2<f32>, b: &ArrayView2<f32>, c: &mut Array2<f32
 }
 
 // Blocking strategy (Cache Locality)
-pub fn blocked_matmul(a: &ArrayView2<f32>, b: &ArrayView2<f32>, c: &mut ArrayView2<f32>){
+pub fn blocked_matmul(a: &ArrayView2<f32>, b: &ArrayView2<f32>, c: &mut Array2<f32>){
     /* The following function implements the blocking strategy 
     The idea is to compute the matmul across blocks of matrices */
     const BLOCK_SIZE: usize = 32; // Do we need to fine tune this? 
