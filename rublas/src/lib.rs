@@ -1,5 +1,7 @@
 use ndarray::{Array2, ArrayView2};
 use ndarray::s;
+pub mod simd; 
+
 
 /// Naive matrix multiplication.
 pub fn naive_matmul(a: &ArrayView2<f32>, b: &ArrayView2<f32>, c: &mut Array2<f32>) {
@@ -107,7 +109,6 @@ pub fn packed_matmul(a: &ArrayView2<f32>, b: &ArrayView2<f32>, c: &mut Array2<f3
 }
 
 // This kernel multiplies the packed, contiguous blocks.
-// It will be replaced by a SIMD version later.
 fn micro_kernel(
     m: usize, n: usize, k: usize,
     pack_a: &[f32],
