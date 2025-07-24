@@ -2,9 +2,9 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use std::hint::black_box;
 use rand;
 use ndarray::{Array, Array2};
-use rublas::{naive_matmul, blocked_matmul}; 
+use rublas::{naive_matmul, blocked_matmul, packed_matmul}; 
 
-fn bench_naive_matmul(c: &mut Criterion) {
+fn benchmark_suite(c: &mut Criterion) -> &mut Criterion {
     // Define matrix dimensions
     let m = 256;
     let k = 256;
@@ -35,7 +35,15 @@ fn bench_naive_matmul(c: &mut Criterion) {
             black_box(&result);
         })
     });
+    // PACK 
+    c.bench_function("packed_matmul_256", | bencher|{
+        let mut result = Array2::<f32>::zeros((m, n));
+        bencher.iter(||{
+            packed_matmul(&a.view(), &b.view(), &mut result);
+            black_box(&result);
+        })
+    })
 }
 
-criterion_group!(benches, bench_naive_matmul);
+criterion_group!(benches, benchmark_suite);
 criterion_main!(benches);
