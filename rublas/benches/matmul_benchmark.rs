@@ -3,7 +3,7 @@ use std::hint::black_box;
 use rand;
 use ndarray::{Array, Array2};
 use rublas::{naive_matmul, blocked_matmul, packed_matmul}; 
-use rublas::simd::packed_matmul_simd;
+use rublas::simd::matmul;
 
 fn benchmark_suite(c: &mut Criterion) -> &mut Criterion {
     // Define matrix dimensions
@@ -14,7 +14,6 @@ fn benchmark_suite(c: &mut Criterion) -> &mut Criterion {
     // Create random matrices
     let a = Array::from_shape_fn((m, k), |_| rand::random());
     let b = Array::from_shape_fn((k, n), |_| rand::random());
-    let result = Array2::<f32>::zeros((m, n));
 
     // NAIVE 
     c.bench_function("naive_matmul_256", |bencher| {
@@ -43,12 +42,12 @@ fn benchmark_suite(c: &mut Criterion) -> &mut Criterion {
             packed_matmul(&a.view(), &b.view(), &mut result);
             black_box(&result);
         })
-    })
+    });
     // SIMD 
     c.bench_function("packed_simd_matmul_256", | bencher | {
         let mut result = Array2::<f32>::zeros((m, n)); 
         bencher.iter(|| unsafe{
-            packed_matmul_simd(&a.view(), &b.view(), &mut result);
+            matmul(&a.view(), &b.view(), &mut result);
             black_box(&result);
         })
     })
